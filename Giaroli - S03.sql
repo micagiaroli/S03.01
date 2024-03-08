@@ -707,3 +707,52 @@ SET SQL_SAFE_UPDATES = 1;
 ###corroboramos actualización del nombre del campo
 DESCRIBE user;
 
+#N3.Exercici 2:crear la vista anomenada "InformeTecnico"
+CREATE VIEW InformeTecnico AS
+SELECT t.id as transaction_id, u.name as user_name, u.surname as user_surname, cc.iban, c.company_name
+FROM company AS c
+INNER JOIN transaction AS t
+ON c.id=t.company_id
+INNER JOIN credit_card AS cc
+ON cc.id=t.credit_card_id
+INNER JOIN user AS u
+ON u.id=t.user_id;
+
+###Corroboramos Vista creada
+SELECT * FROM InformeTecnico
+ORDER BY transaction_id DESC;
+SELECT COUNT(*) FROM InformeTecnico;
+SELECT COUNT(*) FROM transaction;
+#Buscamos el registro extra que aparece en transaction pero no en InformeTecnico
+SELECT id
+FROM transaction
+WHERE id NOT IN (
+	SELECT transaction_id
+    FROM InformeTecnico);
+#Es el registro añadido en el ejercicio 3 del nivel 1 que no tiene compañía registrada. 
+SELECT *
+FROM transaction
+WHERE id ='108B1D1D-5B23-A76C-55EF-C568E49A99DD';
+
+#Decidimos eliminar la vista creada y crear una nueva que incluya todas las transacciones usando LEFT JOIN
+DROP VIEW InformeTecnico;
+
+CREATE VIEW InformeTecnico AS
+SELECT t.id as transaction_id, u.name as user_name, u.surname as user_surname, cc.iban, c.company_name
+FROM transaction AS t
+LEFT JOIN company AS c
+ON c.id=t.company_id
+LEFT JOIN credit_card AS cc
+ON cc.id=t.credit_card_id
+LEFT JOIN user AS u
+ON u.id=t.user_id;
+
+
+###Corroboramos Vista creada
+
+SELECT * FROM InformeTecnico
+ORDER BY transaction_id DESC;
+
+
+
+
