@@ -376,5 +376,21 @@ WHERE country ='Germany';
 
 ### Nivell 3
 #N3.Exercici 1:
+#Para obtener el modelo requerido haremos los siguientes cambios:
 
+##1)eliminamos el campo website de la tabla company
+ALTER TABLE company DROP COLUMN website;
+SELECT * FROM company;
+
+##2)en la tabla credit_card cambiamos el formato de 4 campos y añadimos uno nuevo
+SET SQL_SAFE_UPDATES = 0;
+ALTER TABLE credit_card 	
+	ADD fecha_actual DATE,
+	MODIFY COLUMN id VARCHAR(20),
+	MODIFY COLUMN iban VARCHAR(50),
+    MODIFY COLUMN pin VARCHAR(4),
+    MODIFY COLUMN expiring_date VARCHAR(10);
+SET SQL_SAFE_UPDATES = 1;
+###corroboramos los cambios realizados:
+DESCRIBE credit_card;
 
