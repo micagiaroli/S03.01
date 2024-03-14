@@ -385,7 +385,7 @@ SELECT * FROM company;
 ##2)en la tabla credit_card cambiamos el formato de 4 campos y añadimos uno nuevo
 SET SQL_SAFE_UPDATES = 0;
 ALTER TABLE credit_card 	
-	ADD fecha_actual DATE,
+	ADD fecha_actual DATE DEFAULT (CURRENT_DATE),
 	MODIFY COLUMN id VARCHAR(20),
 	MODIFY COLUMN iban VARCHAR(50),
     MODIFY COLUMN pin VARCHAR(4),
@@ -393,6 +393,8 @@ ALTER TABLE credit_card
 SET SQL_SAFE_UPDATES = 1;
 ###corroboramos los cambios realizados:
 DESCRIBE credit_card;
+SELECT * FROM credit_card;
+
 
 ##3)Creamos la tabla User 
 CREATE INDEX idx_user_id ON transaction(user_id);
