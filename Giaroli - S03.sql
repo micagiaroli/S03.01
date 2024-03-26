@@ -13,12 +13,9 @@ CREATE TABLE credit_card (
 #Mostramos las tablas
 SHOW TABLES;
 
-#Creamos FK
-CREATE INDEX idx_transaction_credit_card_id ON transaction(credit_card_id);
-
-ALTER TABLE credit_card
-ADD CONSTRAINT fk_transaction_credit_card_id
-FOREIGN KEY (id) REFERENCES transaction(credit_card_id);
+#Creamos la FK de transactions
+ALTER TABLE transaction
+ADD FOREIGN KEY (credit_card_id) REFERENCES credit_card(id);
 
 DESCRIBE transaction;
 
@@ -347,10 +344,8 @@ SHOW COLUMNS FROM credit_card;
 
 ### Nivell 2
 #N2.Exercici 1: Elimina de la taula transaction el registre amb ID 02C6201E-D90A-1859-B4EE-88D2986D3B02
-SET FOREIGN_KEY_CHECKS = 0;
 DELETE FROM transaction
 WHERE id ='02C6201E-D90A-1859-B4EE-88D2986D3B02';
-SET FOREIGN_KEY_CHECKS = 1;
 
 #corroboramos borrado de datos
 SELECT *
@@ -412,8 +407,16 @@ CREATE TABLE IF NOT EXISTS user (
         FOREIGN KEY(id) REFERENCES transaction(user_id)        
     );
     
+##Corregimos FK de tabla user
+#tenemos problemas para crearla por la transaccion agregada en el ejercicio 3, la eliminamos
+SELECT * FROM transaction WHERE user_id NOT IN (SELECT id FROM user);
+DELETE FROM transaction WHERE id = '108B1D1D-5B23-A76C-55EF-C568E49A99DD';
+
+ALTER TABLE transaction ADD FOREIGN KEY (user_id) REFERENCES user(id);
+
 ###corroboramos creación de tabla user
 DESCRIBE user;
+DESCRIBE transaction;
 
 ###insertamos los datos
 SET foreign_key_checks = 0;
@@ -712,35 +715,6 @@ DESCRIBE user;
 #N3.Exercici 2:crear la vista anomenada "InformeTecnico"
 CREATE VIEW InformeTecnico AS
 SELECT t.id as transaction_id, u.name as user_name, u.surname as user_surname, cc.iban, c.company_name
-FROM company AS c
-INNER JOIN transaction AS t
-ON c.id=t.company_id
-INNER JOIN credit_card AS cc
-ON cc.id=t.credit_card_id
-INNER JOIN user AS u
-ON u.id=t.user_id;
-
-###Corroboramos Vista creada
-SELECT * FROM InformeTecnico
-ORDER BY transaction_id DESC;
-SELECT COUNT(*) FROM InformeTecnico;
-SELECT COUNT(*) FROM transaction;
-#Buscamos el registro extra que aparece en transaction pero no en InformeTecnico
-SELECT id
-FROM transaction
-WHERE id NOT IN (
-	SELECT transaction_id
-    FROM InformeTecnico);
-#Es el registro añadido en el ejercicio 3 del nivel 1 que no tiene compañía registrada. 
-SELECT *
-FROM transaction
-WHERE id ='108B1D1D-5B23-A76C-55EF-C568E49A99DD';
-
-#Decidimos eliminar la vista creada y crear una nueva que incluya todas las transacciones usando LEFT JOIN
-DROP VIEW InformeTecnico;
-
-CREATE VIEW InformeTecnico AS
-SELECT t.id as transaction_id, u.name as user_name, u.surname as user_surname, cc.iban, c.company_name
 FROM transaction AS t
 LEFT JOIN company AS c
 ON c.id=t.company_id
@@ -754,6 +728,13 @@ ON u.id=t.user_id;
 
 SELECT * FROM InformeTecnico
 ORDER BY transaction_id DESC;
+
+#--------------------------------------------------------------------------
+#Para ejercicio 1 de nivel 3: 
+#Renombramos tabla user a data_user
+ALTER TABLE user RENAME TO data_user;
+
+#Hacemos reverse Engineer para obetener el diagrama del modelo
 
 
 
